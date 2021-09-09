@@ -2,13 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MyPanel extends JPanel {
-    Color bg;
     private Image image;
     private Graphics2D g2d;
-    public MyPanel(int width, int height, Color bg){ 
-        // setPreferredSize(new Dimension(width, height));
-        setSize(width, height);
-        this.bg = bg;
+    public MyPanel(Color bg){ 
         setBackground(bg);
     }
     
@@ -36,7 +32,7 @@ public class MyPanel extends JPanel {
     void ResetFrame(){
         image = createImage(getWidth(), getHeight());
         g2d = (Graphics2D) image.getGraphics();
-        g2d.setColor(bg);
+        g2d.setColor(getBackground());
         g2d.fillRect(0, 0, getWidth(), getHeight());
     }
 }

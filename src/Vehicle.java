@@ -14,23 +14,40 @@ public class Vehicle {
     boolean applyFriction = false;
     int defaultPredictionFactor = 5;
     private Vector lastWanderVector;
-    public Vehicle(int x, int y) {
-        Setup(x,y,new Vector(0,0), new Vector(0, 0));
+        public Vehicle(int x, int y) {
+        Setup(x,y, null);
     }   
     public Vehicle(int x, int y, Vector initialVelocity) {
-        Setup(x, y, initialVelocity, new Vector(0, 0));
+        Setup(x, y, initialVelocity);
     }   
-    public Vehicle(int x, int y, Vector initialVelocity, Vector initialAcceleration) {
-        Setup(x, y, initialVelocity, initialAcceleration);
-    }
-    private void Setup(int x, int y, Vector initialVelocity, Vector initialAcceleration) {
+    private void Setup(int x, int y, Vector initialVelocity) {
         this.x = x;
         this.y = y;
-        vel = new Vector(initialVelocity);
-        acc =  new Vector(initialAcceleration);
+        if (initialVelocity == null){
+            vel = new Vector(0,0);
+        }else{
+            vel = new Vector(initialVelocity);
+        }
+        acc =  new Vector(0,0);
         if (vel.getMag() > maxVel){
             vel.setMag(maxVel);
         }
+    }
+    
+    /***
+     * Sets a random speed and position to the vehicle object
+     * 
+     * @param v  the target object
+     * @param x1 the minimum x position to the vehicle
+     * @param y1 the minimum y position to the vehicle
+     * @param x2 the maximum x position to the vehicle
+     * @param y2 the maximum x position to the vehicle
+     */
+    public void RandomizeVehicle(int x1, int y1, int x2, int y2) {
+        x = ThreadLocalRandom.current().nextInt(x1, x2);
+        y = ThreadLocalRandom.current().nextInt(y1, y2);
+        vel.setMag(ThreadLocalRandom.current().nextInt(7, (int)maxVel+1));
+        vel.setAngleInDegrees(ThreadLocalRandom.current().nextInt(1, 360 + 1));
     }
 
     public void ApplyForce(Vector forceVector){
@@ -75,27 +92,24 @@ public class Vehicle {
             }
         }
         else if (mode == "bounce") {
-            // if(x - r <= x1 || x + r >= x2){
-            //     vel.setXMag(-vel.getXMag());
-            // }
-            // else if (y - r <= y1 || y + r>= y2){
-            //     vel.setYMag(-vel.getYMag());
-            // }
             if (x - r <= x1) {
                 vel.setXMag(Math.abs(vel.getXMag()));
-            }
-            else if (x + r >= x2) {
+                x = x1 + r;
+            } else if (x + r >= x2) {
                 vel.setXMag(-Math.abs(vel.getXMag()));
-            } else if (y - r <= y1) {
+                x = x2 -r;
+            } 
+            if (y - r <= y1) {
                 vel.setYMag(-Math.abs(vel.getYMag()));
+                y = y1 + r;
             } else if (y + r >= y2) {
                 vel.setYMag(Math.abs(vel.getYMag()));
+                y = y2 - r;
             }
         }
     }
 
     public Vector GetSteeringForce(double x, double y, boolean flee){
-        // double desiredMag = Math.pow(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) , 0.5);
         double desiredMag = CalculateDistance(this.x, this.y, x, y);
         if (desiredMag > maxVel){
             desiredMag = maxVel;
