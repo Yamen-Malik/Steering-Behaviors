@@ -157,8 +157,9 @@ public class MenuFrame extends JFrame{
         //#region Create combo boxes
         JComboBox<String> behaviorSelector = new JComboBox<>(behaviors);
         JComboBox<String> targetSelector = new JComboBox<>();
-        targetSelectorsList[vehiclesCount -1] = targetSelector;
         behaviorSelector.setSelectedItem(vehicle.behavior.toString());
+        targetSelectorsList[vehiclesCount -1] = targetSelector;
+        targetSelector.setPreferredSize(new Dimension(99, 24));
         
         // Update the combobox models for all target selectors  (every time a new vehicle in added)
         for (int i = 0; i < vehiclesCount; i++){
