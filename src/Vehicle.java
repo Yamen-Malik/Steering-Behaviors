@@ -1,5 +1,4 @@
 import java.util.concurrent.ThreadLocalRandom;
-
 public class Vehicle {
     int x;
     int y;
@@ -7,14 +6,16 @@ public class Vehicle {
     Vector acc; // acceleration
     double maxVel = 20;
     double maxForce = 1.5;
-    double mass = 10;
-    int r = 20;
+    double mass = 1;
+    int size = 20;
     java.awt.Color color = java.awt.Color.WHITE;
     double frictionPercentage = 0.03;
     boolean applyFriction = false;
     int defaultPredictionFactor = 5;
+    Vehicle target;
+    String behavior = "Wander";
     private Vector lastWanderVector;
-        public Vehicle(int x, int y) {
+    public Vehicle(int x, int y) {
         Setup(x,y, null);
     }   
     public Vehicle(int x, int y, Vector initialVelocity) {
@@ -43,25 +44,61 @@ public class Vehicle {
      * @param x2 the maximum x position to the vehicle
      * @param y2 the maximum x position to the vehicle
      */
-    public void RandomizeVehicle(int x1, int y1, int x2, int y2) {
+    public void Randomize(int x1, int y1, int x2, int y2) {
+        RandomizePosition(x1, y1, x2, y2);
+        RandomizeVelocity();
+    }
+    /***
+    * Sets a random position to the vehicle object
+    * 
+    * @param v  the target object
+    * @param x1 the minimum x position to the vehicle
+    * @param y1 the minimum y position to the vehicle
+    * @param x2 the maximum x position to the vehicle
+    * @param y2 the maximum x position to the vehicle
+    */
+    public void RandomizePosition(int x1, int y1, int x2, int y2) {
         x = ThreadLocalRandom.current().nextInt(x1, x2);
         y = ThreadLocalRandom.current().nextInt(y1, y2);
-        vel.setMag(ThreadLocalRandom.current().nextInt(7, (int)maxVel+1));
-        vel.setAngleInDegrees(ThreadLocalRandom.current().nextInt(1, 360 + 1));
     }
+    /**
+    * Sets a random Velociy to the vehicle object
+    */
+    public void RandomizeVelocity() {
+        vel.setMag(ThreadLocalRandom.current().nextInt(7, (int)maxVel+1));
+        vel.setAngleInDegrees(ThreadLocalRandom.current().nextInt(1, 360 + 1));    
+    }
+    
 
     public void ApplyForce(Vector forceVector){
-        //? devide by mass
-        //? limit force
-        forceVector = new Vector(forceVector);
+        forceVector = new Vector(forceVector).divide(mass);
         if(forceVector.getMag() > maxForce){
             forceVector.setMag(maxForce);
         }
         acc.add(forceVector);
     }
     public void Update(){
-        // apply friction and gravity
-        // //ApplyForce(new Vector(frictionPercentage * vel.getMag(), vel.getAngleInDegrees() - 180));
+        if(target != null || behavior == "Wander"){
+            switch(behavior){
+                case "Wander":
+                    Wander();
+                    break;
+                case "Seek":
+                    Seek(target.x, target.y);
+                    break;
+                case "Flee":
+                    Flee(target.x, target.y);
+                    break;
+                case "Pursue":
+                    Pursue(target);
+                    break;
+                case "Evade":
+                    Evade(target);
+                    break;
+            // default:
+            //     throw new IllegalArgumentException("behavior has an invalid value");
+            }
+        }
         if(applyFriction)
             ApplyForce(Vector.Multiply(vel, -frictionPercentage));
         
@@ -92,19 +129,19 @@ public class Vehicle {
             }
         }
         else if (mode == "bounce") {
-            if (x - r <= x1) {
+            if (x - size <= x1) {
                 vel.setXMag(Math.abs(vel.getXMag()));
-                x = x1 + r;
-            } else if (x + r >= x2) {
+                x = x1 + size;
+            } else if (x + size >= x2) {
                 vel.setXMag(-Math.abs(vel.getXMag()));
-                x = x2 -r;
+                x = x2 -size;
             } 
-            if (y - r <= y1) {
+            if (y - size <= y1) {
                 vel.setYMag(-Math.abs(vel.getYMag()));
-                y = y1 + r;
-            } else if (y + r >= y2) {
+                y = y1 + size;
+            } else if (y + size >= y2) {
                 vel.setYMag(Math.abs(vel.getYMag()));
-                y = y2 - r;
+                y = y2 - size;
             }
         }
     }
@@ -157,10 +194,12 @@ public class Vehicle {
         }
         Vector wanderVector = new Vector(20, wanderAngle);
         lastWanderVector = wanderVector;
-        // System.out.println(wanderVector.getAngleInDegrees() > 360);
         Seek(predictedPosition[0] + wanderVector.getXMag(), predictedPosition[1] + wanderVector.getYMag());
     }
     private static double CalculateDistance(double x1, double y1, double x2, double y2){
         return Math.pow(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2) , 0.5);
+    }
+    public static boolean CheckCollition(Vehicle v1, Vehicle v2) {
+        return Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2) < Math.pow(v2.size + v1.size, 2);
     }
 }

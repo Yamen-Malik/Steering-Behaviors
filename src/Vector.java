@@ -86,13 +86,23 @@ public class Vector{
     //#endregion
     
     /**
-     * Multiplys the vector by a scalar value and sets this vector values to the result
+     * Multiplys the vector by a scalar value and sets the vector magnitude to the result
      * 
      * @param scalar
      * @return a refrence to this vector
      */
     public Vector multiply(double scalar){
         setMag(mag * scalar);
+        return this;
+    }
+    /**
+     * Divides the vector by a divisor value and sets the vector magnitude to the result
+     * 
+     * @param divisor
+     * @return a refrence to this vector
+     */
+    public Vector divide(double divisor){
+        setMag(mag / divisor);
         return this;
     }
     /**
@@ -176,7 +186,7 @@ public class Vector{
         return Math.abs(v1.mag * v2.mag) * Math.cos(Math.abs(v1.angle - v2.angle));
     }
     /**
-     * Create a copy of the vector and Multiplys it by a scalar value
+     * Create a copy of a vector and Multiplys it by a scalar value
      * 
      * @param v
      * @param scalar
@@ -184,6 +194,16 @@ public class Vector{
      */
     public static Vector Multiply(Vector v, double scalar){
         return new Vector(v).multiply(scalar);
+    }
+    /**
+     * Create a copy of a vector and Divides it by a divisor value
+     * 
+     * @param v
+     * @param divisor
+     * @return new Vector, equal to the result
+     */
+    public static Vector Divide(Vector v, double divisor){
+        return new Vector(v).divide(divisor );
     }
     public static Vector CreateVectorFromXY(double x, double y){
         Vector v = new Vector(0,0);
