@@ -15,7 +15,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JOptionPane;
 
-
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,9 +30,10 @@ public class MenuFrame extends JFrame{
     JPanel vehiclesContainer;
     Border defaultBorder;
     Vehicle[] vehicles = new Vehicle[maxVehicles];
+    String[] behaviors; 
     JComboBox<String>[] targetSelectorsList = new JComboBox[maxVehicles];
-    JButton startButton;
     String defaultTargetListText = "None";  // or "Select target"
+    JButton startButton;
     final int width = 1000;
     final int height = 700;
     public MenuFrame(){
@@ -68,12 +68,16 @@ public class MenuFrame extends JFrame{
         add(startButton);
         setVisible(true);
 
+        behaviors = new String[Vehicle.Behavior.values().length];
+        for(int i = 0; i < behaviors.length; i++){
+            behaviors[i] = Vehicle.Behavior.values()[i].toString();
+        }
         // Add default vehicles
         Vehicle target = new Vehicle(0, 0);
         Vehicle pursuer = new Vehicle(0, 0);
 
         target.Randomize(0, 0, 100, 100);
-        pursuer.behavior = "Pursue";
+        pursuer.behavior = Vehicle.Behavior.Pursue;
         pursuer.target = target;
 
         AddVehicle(target);
@@ -151,10 +155,10 @@ public class MenuFrame extends JFrame{
         //#endregion
         
         //#region Create combo boxes
-        JComboBox<String> behaviorSelector = new JComboBox<>(new String[] { "Wander", "Seek", "Flee", "Pursue", "Evade"});
+        JComboBox<String> behaviorSelector = new JComboBox<>(behaviors);
         JComboBox<String> targetSelector = new JComboBox<>();
         targetSelectorsList[vehiclesCount -1] = targetSelector;
-        behaviorSelector.setSelectedItem(vehicle.behavior);
+        behaviorSelector.setSelectedItem(vehicle.behavior.toString());
         
         // Update the combobox models for all target selectors  (every time a new vehicle in added)
         for (int i = 0; i < vehiclesCount; i++){
@@ -185,7 +189,7 @@ public class MenuFrame extends JFrame{
         behaviorSelector.addActionListener(e -> {
             String behaviorText = String.valueOf(behaviorSelector.getSelectedItem());
             UpdateTargetSelector(targetSelector, behaviorText);
-            vehicle.behavior = behaviorText;
+            vehicle.behavior = Vehicle.Behavior.valueOf(behaviorText);
         });
         targetSelector.addActionListener(e ->{
             int targetIndex = targetSelector.getSelectedIndex()-1;

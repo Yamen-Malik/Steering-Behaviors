@@ -24,11 +24,11 @@ public class App {
                 if(!ready) {continue;}
                 for (Vehicle v : vehicles) {
                     if (v == null) { break; }
-                    if(v.target != null && (v.behavior == "Seek" || v.behavior == "Pursue") && Vehicle.CheckCollition(v, v.target)){
+                    if(v.target != null && (v.behavior == Vehicle.Behavior.Seek || v.behavior == Vehicle.Behavior.Pursue) && Vehicle.CheckCollition(v, v.target)){
                         v.target.Randomize(0, 0, frame.getWidth(), frame.getHeight());
                     }
                     v.Update();
-                    v.Edges(0, frame.getWidth(), 0, frame.getHeight(), "bounce");
+                    v.Edges(0, frame.getWidth(), 0, frame.getHeight(), Vehicle.EdgeMode.Bounce);
                     panel.DrawVehicle(v);
                 }
                 panel.Paint();

@@ -9,11 +9,9 @@ public class Vehicle {
     double mass = 1;
     int size = 20;
     java.awt.Color color = java.awt.Color.WHITE;
-    double frictionPercentage = 0.03;
-    boolean applyFriction = false;
     int defaultPredictionFactor = 5;
     Vehicle target;
-    String behavior = "Wander";
+    Behavior behavior = Behavior.Wander;
     private Vector lastWanderVector;
     public Vehicle(int x, int y) {
         Setup(x,y, null);
@@ -78,30 +76,27 @@ public class Vehicle {
         acc.add(forceVector);
     }
     public void Update(){
-        if(target != null || behavior == "Wander"){
+        if(target != null || behavior == Behavior.Wander){
             switch(behavior){
-                case "Wander":
+                case Wander:
                     Wander();
                     break;
-                case "Seek":
+                case Seek:
                     Seek(target.x, target.y);
                     break;
-                case "Flee":
+                case Flee:
                     Flee(target.x, target.y);
                     break;
-                case "Pursue":
+                case Pursue:
                     Pursue(target);
                     break;
-                case "Evade":
+                case Evade:
                     Evade(target);
                     break;
             // default:
             //     throw new IllegalArgumentException("behavior has an invalid value");
             }
         }
-        if(applyFriction)
-            ApplyForce(Vector.Multiply(vel, -frictionPercentage));
-        
         vel.add(acc);
         if(vel.getMag() > maxVel)
             vel.setMag(maxVel);
@@ -113,36 +108,38 @@ public class Vehicle {
     /***
      * @param mode available modes ("flip","bounce")
      */
-    public void Edges(int x1,int x2,int y1,int y2, String mode){
-        if(mode == "flip"){
-            if(x <= x1){
-                x=x2;
-            }
-            else if(x >= x2){
-                x = x1;
-            }
-            if(y <= y1){
-                y = y2;
-            }
-            else if(y >= y2){
-                y = y1;
-            }
-        }
-        else if (mode == "bounce") {
-            if (x - size <= x1) {
-                vel.setXMag(Math.abs(vel.getXMag()));
-                x = x1 + size;
-            } else if (x + size >= x2) {
-                vel.setXMag(-Math.abs(vel.getXMag()));
-                x = x2 -size;
-            } 
-            if (y - size <= y1) {
-                vel.setYMag(-Math.abs(vel.getYMag()));
-                y = y1 + size;
-            } else if (y + size >= y2) {
-                vel.setYMag(Math.abs(vel.getYMag()));
-                y = y2 - size;
-            }
+    public void Edges(int x1,int x2,int y1,int y2, EdgeMode mode){
+        switch(mode){
+            case Flip:
+                if(x <= x1){
+                    x=x2;
+                }
+                else if(x >= x2){
+                    x = x1;
+                }
+                if(y <= y1){
+                    y = y2;
+                }
+                else if(y >= y2){
+                    y = y1;
+                }
+            break;
+            case Bounce:
+                if (x - size <= x1) {
+                    vel.setXMag(Math.abs(vel.getXMag()));
+                    x = x1 + size;
+                } else if (x + size >= x2) {
+                    vel.setXMag(-Math.abs(vel.getXMag()));
+                    x = x2 -size;
+                } 
+                if (y - size <= y1) {
+                    vel.setYMag(-Math.abs(vel.getYMag()));
+                    y = y1 + size;
+                } else if (y + size >= y2) {
+                    vel.setYMag(Math.abs(vel.getYMag()));
+                    y = y2 - size;
+                }
+            break;
         }
     }
 
@@ -202,4 +199,7 @@ public class Vehicle {
     public static boolean CheckCollition(Vehicle v1, Vehicle v2) {
         return Math.pow(v1.x - v2.x, 2) + Math.pow(v1.y - v2.y, 2) < Math.pow(v2.size + v1.size, 2);
     }
+
+    enum Behavior{Wander, Seek, Flee, Pursue, Evade}
+    enum EdgeMode {Bounce, Flip}
 }
