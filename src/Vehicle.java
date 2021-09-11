@@ -12,6 +12,7 @@ public class Vehicle {
     int defaultPredictionFactor = 5;
     Vehicle target;
     Behavior behavior = Behavior.Wander;
+    EdgeMode edgeMode = EdgeMode.Bounce;
     private Vector lastWanderVector;
     public Vehicle(int x, int y) {
         Setup(x,y, null);
@@ -108,8 +109,8 @@ public class Vehicle {
     /***
      * @param mode available modes ("flip","bounce")
      */
-    public void Edges(int x1,int x2,int y1,int y2, EdgeMode mode){
-        switch(mode){
+    public void Edges(int x1,int x2,int y1,int y2){
+        switch(edgeMode){
             case Flip:
                 if(x <= x1){
                     x=x2;

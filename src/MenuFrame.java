@@ -31,10 +31,11 @@ public class MenuFrame extends JFrame{
     Border defaultBorder;
     Vehicle[] vehicles = new Vehicle[maxVehicles];
     String[] behaviors; 
+    String[] edgeModes; 
     JComboBox<String>[] targetSelectorsList = new JComboBox[maxVehicles];
     String defaultTargetListText = "None";  // or "Select target"
     JButton startButton;
-    final int width = 1000;
+    final int width = 1100;
     final int height = 700;
     public MenuFrame(){
         setSize(width, height);
@@ -72,6 +73,10 @@ public class MenuFrame extends JFrame{
         for(int i = 0; i < behaviors.length; i++){
             behaviors[i] = Vehicle.Behavior.values()[i].toString();
         }
+        edgeModes = new String[Vehicle.EdgeMode.values().length];
+        for(int i = 0; i < edgeModes.length; i++){
+            edgeModes[i] = Vehicle.EdgeMode.values()[i].toString();
+        }
         // Add default vehicles
         Vehicle target = new Vehicle(0, 0);
         Vehicle pursuer = new Vehicle(0, 0);
@@ -98,21 +103,23 @@ public class MenuFrame extends JFrame{
         
         //#region create lables and set their font
         JLabel massLable = new JLabel("Mass:");
-        JLabel maxVelLable = new JLabel("<html><center> Maximum <br/> velocity:</center></html>", 0);
+        JLabel maxVelLable = new JLabel("<html><center> Maximum <br/> Velocity:</center></html>", 0);
         JLabel maxForceLable = new JLabel("<html><center> Maximum <br/> Force: </center></html>" , 0);
         JLabel sizeLable = new JLabel("size:");
-        JLabel ColorLable = new JLabel("Hex Color:");
+        JLabel ColorLable = new JLabel("<html><center>Color<br>[Hex]:<center></html>");
         JLabel BehaviorLable = new JLabel("Behavior:");
         JLabel targetLable = new JLabel("Target:");
+        JLabel edgeModeLable = new JLabel("<html><center>Edge<br/>Mode:</center></html>");
         
         Font font = new Font("Dialog", Font.PLAIN, 12);
-        // *massLable.setFont(font);
+        massLable.setFont(font);
         maxVelLable.setFont(font);
         maxForceLable.setFont(font);
         sizeLable.setFont(font);
         ColorLable.setFont(font);
         BehaviorLable.setFont(font);
         targetLable.setFont(font);
+        edgeModeLable.setFont(font);
         //#endregion
 
         //#region Create number spinners
@@ -157,7 +164,9 @@ public class MenuFrame extends JFrame{
         //#region Create combo boxes
         JComboBox<String> behaviorSelector = new JComboBox<>(behaviors);
         JComboBox<String> targetSelector = new JComboBox<>();
+        JComboBox<String> edgeModeSelector = new JComboBox<>(edgeModes);
         behaviorSelector.setSelectedItem(vehicle.behavior.toString());
+        edgeModeSelector.setSelectedItem(vehicle.edgeMode.toString());
         targetSelectorsList[vehiclesCount -1] = targetSelector;
         targetSelector.setPreferredSize(new Dimension(99, 24));
         
@@ -187,6 +196,7 @@ public class MenuFrame extends JFrame{
 
         behaviorSelector.setFocusable(false);
         targetSelector.setFocusable(false);
+        edgeModeSelector.setFocusable(false);
         behaviorSelector.addActionListener(e -> {
             String behaviorText = String.valueOf(behaviorSelector.getSelectedItem());
             UpdateTargetSelector(targetSelector, behaviorText);
@@ -203,6 +213,9 @@ public class MenuFrame extends JFrame{
                 if(Arrays.asList(vehicles).indexOf(vehicle) <= targetIndex) {targetIndex++;}
                 vehicle.target = vehicles[targetIndex];
             }
+        });
+        edgeModeSelector.addActionListener(e ->{
+            vehicle.edgeMode = Vehicle.EdgeMode.valueOf(String.valueOf(edgeModeSelector.getSelectedItem()));
         });
         //#endregion
         
@@ -253,6 +266,9 @@ public class MenuFrame extends JFrame{
         vPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         vPanel.add(targetLable);
         vPanel.add(targetSelector);
+        vPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        vPanel.add(edgeModeLable);
+        vPanel.add(edgeModeSelector);
         vPanel.add(Box.createRigidArea(new Dimension(5, 0)));
         vPanel.add(ColorLable);
         vPanel.add(colorField);

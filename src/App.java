@@ -28,7 +28,7 @@ public class App {
                         v.target.Randomize(0, 0, frame.getWidth(), frame.getHeight());
                     }
                     v.Update();
-                    v.Edges(0, frame.getWidth(), 0, frame.getHeight(), Vehicle.EdgeMode.Bounce);
+                    v.Edges(0, frame.getWidth(), 0, frame.getHeight());
                     panel.DrawVehicle(v);
                 }
                 panel.Paint();
