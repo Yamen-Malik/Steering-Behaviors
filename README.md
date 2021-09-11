@@ -1,15 +1,14 @@
-Steerinng Behaviors
+Steering Behaviors
 ====================
 About the project
 -----------------
 In this project I followed the nature of code [course](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6ZV4yEcW3uDwOgGXKUUsPOM) / [book](https://natureofcode.com) from [the coding train](https://www.youtube.com/c/TheCodingTrain) channel.
 
-
 Requirements
 ------------
-All you need to run this code on your device is:
+This code uses:
 1. Java
-2. Swing library (for graphics)
+2. Swing library
 
 About The App
 --------------
