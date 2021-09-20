@@ -1,5 +1,6 @@
 import java.awt.Color;
-
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 public class App {    
     static int initialWidth = 600;
     static int initialHeight = 600;
@@ -37,10 +38,16 @@ public class App {
     }
     
     public static void Start(Vehicle[] vehicles){
-        menuFrame.dispose(); // can't use dispatchEvent because it closes the whole program
         frame = new SimulationFrame(initialWidth, initialHeight);
         panel = new SimulationPanel(Color.BLACK);
         frame.add(panel);
+        frame.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e) { // when the simulation frame is closed open the menu frame
+                ready = false;
+                menuFrame.setVisible(true);
+            }
+        });
         App.vehicles = vehicles;
         for (Vehicle v : vehicles) {
             if (v == null) {break;}

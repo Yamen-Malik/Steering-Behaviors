@@ -59,8 +59,7 @@ public class MenuFrame extends JFrame{
         startButton.setEnabled(false); // diable the start button until we add vehicles
         addButton.addActionListener(e -> AddVehicle());
         startButton.addActionListener(e -> {
-            startButton.setEnabled(false);
-            addButton.setEnabled(false);
+            setVisible(false);
             App.Start(vehicles);
         });
 
@@ -77,17 +76,10 @@ public class MenuFrame extends JFrame{
         for(int i = 0; i < edgeModes.length; i++){
             edgeModes[i] = Vehicle.EdgeMode.values()[i].toString();
         }
-        // Add default vehicles
-        Vehicle target = new Vehicle(0, 0);
-        Vehicle pursuer = new Vehicle(0, 0);
-
-        target.Randomize(0, 0, 100, 100);
-        pursuer.behavior = Vehicle.Behavior.Pursue;
-        pursuer.target = target;
-
-        AddVehicle(target);
-        AddVehicle(pursuer);
+        // Add default vehicle
+        AddVehicle();
     }
+    // The tow ways of calling AddVehicle gives me the flexibility to add vehicle presets if I ever needed to
     private void AddVehicle(){
         AddVehicle(new Vehicle(0, 0));
     }
