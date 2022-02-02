@@ -1,4 +1,5 @@
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.LinkedList;
 public class Vehicle {
     int x;
     int y;
@@ -8,6 +9,8 @@ public class Vehicle {
     double maxForce = 1.5;
     double mass = 1;
     int size = 20;
+    int pathLength = 50;
+    LinkedList<int[]> path = new LinkedList<>();
     java.awt.Color color = java.awt.Color.WHITE;
     int defaultPredictionFactor = 5;
     Vehicle target;
@@ -105,6 +108,16 @@ public class Vehicle {
         x +=(int) vel.getXMag();
         y -= (int) vel.getYMag();
         acc.setMag(0);
+        if (path.size() >= pathLength){
+            path.poll();
+        }
+        if (!path.isEmpty() 
+            && (Math.abs(x - path.getLast()[0]) > Math.abs(vel.getXMag()) + size 
+                || Math.abs(y - path.getLast()[1]) > Math.abs(vel.getYMag()) + size))
+        {
+            path.clear();
+        }
+        path.add(new int[]{x,y});
     }
     /***
      * @param mode available modes ("flip","bounce")

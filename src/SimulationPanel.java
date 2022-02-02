@@ -28,6 +28,14 @@ public class SimulationPanel extends JPanel {
         int bX = v.x + (int) (Math.cos(v.vel.getAngleInRadians() - (Math.toRadians(140))) * v.size);
         int bY = v.y - (int) (Math.sin(v.vel.getAngleInRadians() - (Math.toRadians(140))) * v.size);
         g2d.fillPolygon(new int[] { headX, aX, bX }, new int[] { headY, aY, bY }, 3);
+        
+        //Draw vehicle path
+        int pathX[] = new int[v.path.size()], pathY[] = new int[v.path.size()];
+        for(int i = 0; i < v.path.size(); i++){
+            pathX[i] = v.path.get(i)[0];
+            pathY[i] = v.path.get(i)[1];
+        }
+        g2d.drawPolyline(pathX, pathY, v.path.size());
     }
 
     public void Paint() {
