@@ -115,7 +115,9 @@ public class Vehicle {
             && (Math.abs(x - path.getLast()[0]) > Math.abs(vel.getXMag()) + size 
                 || Math.abs(y - path.getLast()[1]) > Math.abs(vel.getYMag()) + size))
         {
-            path.clear();
+            // Add [-1, -1] to indicate the end of the previous path line and start a new line
+            path.poll();
+            path.add(new int[]{-1,-1});
         }
         path.add(new int[]{x,y});
     }
