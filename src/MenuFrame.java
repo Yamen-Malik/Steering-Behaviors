@@ -192,6 +192,7 @@ public class MenuFrame extends JFrame{
         behaviorSelector.addActionListener(e -> {
             String behaviorText = String.valueOf(behaviorSelector.getSelectedItem());
             UpdateTargetSelector(targetSelector, behaviorText);
+            UpdateEdgeModeSelector(edgeModeSelector, behaviorText);
             vehicle.behavior = Vehicle.Behavior.valueOf(behaviorText);
         });
         targetSelector.addActionListener(e ->{
@@ -283,6 +284,22 @@ public class MenuFrame extends JFrame{
             targetSelector.setSelectedIndex(0);
         }else{
             targetSelector.setEnabled(true);
+        }
+    }    
+    
+    /**
+     * Enables and Disables the edge mode selector object based on the selected
+     * behavior (e.g Flee, Evade = disabled)
+     * 
+     * @param edgeModeSelector the JcomboBox object that selects the edge mode
+     * @param behavior       the selected behavior
+     */
+    private void UpdateEdgeModeSelector(JComboBox<String> edgeModeSelector, String behavior){
+        if(behavior == "Flee" || behavior == "Evade"){
+            edgeModeSelector.setEnabled(false);
+            edgeModeSelector.setSelectedItem("Bounce");;
+        }else{
+            edgeModeSelector.setEnabled(true);
         }
     }
 }
