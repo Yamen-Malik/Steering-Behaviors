@@ -97,8 +97,8 @@ public class Vehicle {
                 case Evade:
                     Evade(target);
                     break;
-            // default:
-            //     throw new IllegalArgumentException("behavior has an invalid value");
+            default:
+                throw new IllegalArgumentException("behavior has an invalid value");
             }
         }
         vel.add(acc);
