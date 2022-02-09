@@ -28,8 +28,7 @@ public class App {
                     if(v.target != null && (v.behavior == Vehicle.Behavior.Seek || v.behavior == Vehicle.Behavior.Pursue) && Vehicle.CheckCollition(v, v.target)){
                         v.target.Randomize(0, 0, frame.getWidth(), frame.getHeight());
                     }
-                    v.Update();
-                    v.Edges(0, frame.getWidth(), 0, frame.getHeight());
+                    v.Update(0, frame.getWidth(), 0, frame.getHeight());
                     panel.DrawVehicle(v);
                 }
                 panel.Paint();

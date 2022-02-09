@@ -33,18 +33,25 @@ public class SimulationPanel extends JPanel {
         //Draw vehicle path
         int pathX[] = new int[v.path.size()], pathY[] = new int[v.path.size()];
         for(int i = 0; i < v.path.size(); i++){
-            //IOf the list contains [-1,-1] draw multiple lines instead of one to avoid drawing a line across the whole screen
-            // Note: if the list contains [-1,-1] in i index then it's guaranteed to have an element in i+1
-            if(v.path.get(i)[0] == -1 && v.path.get(i)[1] == -1){
-                g2d.drawPolyline(pathX, pathY, i);
-                Arrays.fill(pathX, v.path.get(i+1)[0]);
-                Arrays.fill(pathY, v.path.get(i+1)[1]);
-                continue;
+            if(v.pathMode == Vehicle.PathMode.Dotted){
+                g2d.drawOval(v.path.get(i)[0], v.path.get(i)[1], 1, 1);
             }
-            pathX[i] = v.path.get(i)[0];
-            pathY[i] = v.path.get(i)[1];
+            else if(v.pathMode == Vehicle.PathMode.Line) {
+                //If the list contains [-1,-1] draw multiple lines instead of one to avoid drawing a line across the whole screen
+                // Note: if the list contains [-1,-1] in i index then it's guaranteed to have an element in i+1
+                if(v.path.get(i)[0] == -1 && v.path.get(i)[1] == -1){
+                    g2d.drawPolyline(pathX, pathY, i);
+                    Arrays.fill(pathX, v.path.get(i+1)[0]);
+                    Arrays.fill(pathY, v.path.get(i+1)[1]);
+                    continue;
+                }
+                pathX[i] = v.path.get(i)[0];
+                pathY[i] = v.path.get(i)[1];
+            }
         }
-        g2d.drawPolyline(pathX, pathY, v.path.size());
+        if(v.pathMode == Vehicle.PathMode.Line){
+            g2d.drawPolyline(pathX, pathY, v.path.size());
+        }
     }
 
     public void Paint() {
