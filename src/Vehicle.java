@@ -1,4 +1,5 @@
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.LinkedList;
 public class Vehicle {
     int x;
     int y;
@@ -8,11 +9,14 @@ public class Vehicle {
     double maxForce = 1.5;
     double mass = 1;
     int size = 20;
+    int pathLength = 50;
+    LinkedList<int[]> path = new LinkedList<>();
     java.awt.Color color = java.awt.Color.WHITE;
     int defaultPredictionFactor = 5;
     Vehicle target;
     Behavior behavior = Behavior.Wander;
     EdgeMode edgeMode = EdgeMode.Bounce;
+    PathMode pathMode = PathMode.Line;
     private Vector lastWanderVector;
     public Vehicle(int x, int y) {
         Setup(x,y, null);
@@ -64,7 +68,7 @@ public class Vehicle {
     * Sets a random Velociy to the vehicle object
     */
     public void RandomizeVelocity() {
-        vel.setMag(ThreadLocalRandom.current().nextInt(7, (int)maxVel+1));
+        vel.setMag(ThreadLocalRandom.current().nextInt((int) (maxVel*0.1), (int)maxVel+1));
         vel.setAngleInDegrees(ThreadLocalRandom.current().nextInt(1, 360 + 1));    
     }
     
@@ -76,7 +80,16 @@ public class Vehicle {
         }
         acc.add(forceVector);
     }
-    public void Update(){
+
+    /***
+     * Updates the position of the vehicle
+     * 
+     * @param x1 the minimum x position to the vehicle
+     * @param y1 the minimum y position to the vehicle
+     * @param x2 the maximum x position to the vehicle
+     * @param y2 the maximum x position to the vehicle
+     */
+    public void Update(int x1, int x2, int y1, int y2){
         if(target != null || behavior == Behavior.Wander){
             switch(behavior){
                 case Wander:
@@ -105,10 +118,24 @@ public class Vehicle {
         x +=(int) vel.getXMag();
         y -= (int) vel.getYMag();
         acc.setMag(0);
+        
+        // Constrain the position with the edges of the screen
+        Edges(x1, x2, y1, y2);
+        
+        // Add the current position to the path list
+        if (path.size() >= pathLength){
+            path.poll();
+        }
+        if (!path.isEmpty() 
+            && (Math.abs(x - path.getLast()[0]) > Math.abs(vel.getXMag()) 
+                || Math.abs(y - path.getLast()[1]) > Math.abs(vel.getYMag())))
+        {
+            // Add [-1, -1] to indicate the end of the previous path line and start a new line
+            path.poll();
+            path.add(new int[]{-1,-1});
+        }
+        path.add(new int[]{x,y});
     }
-    /***
-     * @param mode available modes ("flip","bounce")
-     */
     public void Edges(int x1,int x2,int y1,int y2){
         switch(edgeMode){
             case Flip:
@@ -126,19 +153,19 @@ public class Vehicle {
                 }
             break;
             case Bounce:
-                if (x - size <= x1) {
+                if (x <= x1) {
                     vel.setXMag(Math.abs(vel.getXMag()));
-                    x = x1 + size;
-                } else if (x + size >= x2) {
+                    x = x1;
+                } else if (x >= x2-1) {
                     vel.setXMag(-Math.abs(vel.getXMag()));
-                    x = x2 -size;
+                    x = x2-1;
                 } 
-                if (y - size <= y1) {
+                if (y <= y1) {
                     vel.setYMag(-Math.abs(vel.getYMag()));
-                    y = y1 + size;
-                } else if (y + size >= y2) {
+                    y = y1;
+                } else if (y >= y2 - 38) {  // 38 is apparently the magic number
                     vel.setYMag(Math.abs(vel.getYMag()));
-                    y = y2 - size;
+                    y = y2 - 38;
                 }
             break;
         }
@@ -203,4 +230,5 @@ public class Vehicle {
 
     enum Behavior{Wander, Seek, Flee, Pursue, Evade}
     enum EdgeMode {Bounce, Flip}
+    enum PathMode {Dotted, Line}
 }
