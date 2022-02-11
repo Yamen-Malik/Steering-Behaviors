@@ -45,6 +45,12 @@ public class App {
             public void windowClosing(WindowEvent e) { // when the simulation frame is closed open the menu frame
                 ready = false;
                 menuFrame.setVisible(true);
+                for (Vehicle v : vehicles) {
+                    if (v == null) break;
+                    v.path.clear();
+                    v.vel.setMag(0);
+                    v.acc.setMag(0);
+                } 
             }
         });
         App.vehicles = vehicles;

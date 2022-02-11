@@ -6,7 +6,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -20,6 +19,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -29,8 +29,6 @@ import java.awt.Insets;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentAdapter;
-import java.awt.event.WindowStateListener;
-import java.awt.event.WindowEvent;
 import java.awt.event.KeyEvent;
 
 import java.util.Arrays;
@@ -41,7 +39,6 @@ public class MenuFrame extends JFrame{
     int maxVehicles = 50;
     JScrollPane vehiclesScrollPane;
     JPanel vehiclesContainer;
-    SpringLayout vehiclesLayout;
     Border defaultBorder;
     Vehicle[] vehicles = new Vehicle[maxVehicles];
     String[] behaviors; 
@@ -49,31 +46,28 @@ public class MenuFrame extends JFrame{
     String[] pathModes; 
     JComboBox<String>[] targetSelectorsList = new JComboBox[maxVehicles];
     String defaultTargetListText = "None";  // or "Select target"
-    JButton startButton;
     final int VPANEL_WIDTH = 400;
     final int VPANEL_HEIGHT = 200;
     final int VPANEL_MARGIN = 5;
-    int initialWidth = 1100;
+    int initialWidth = 900;
     int initialHeight = 700;
     
     public MenuFrame(){
         setSize(initialWidth, initialHeight);
+        setMinimumSize(new Dimension(VPANEL_WIDTH + 80, VPANEL_HEIGHT + 130));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Steering Behaviors Menu");
-        setLayout(new FlowLayout(FlowLayout.CENTER, 40, 5));
         
         defaultBorder = BorderFactory.createLineBorder(Color.lightGray, 3, true);
        
-        vehiclesLayout = new SpringLayout();
-        vehiclesContainer = new JPanel(vehiclesLayout);
+        vehiclesContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, VPANEL_MARGIN, VPANEL_MARGIN));
         vehiclesScrollPane = new JScrollPane(vehiclesContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         vehiclesScrollPane.setBorder(new TitledBorder(defaultBorder, "Vehicles"));
-        vehiclesScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight() - 90));
         vehiclesScrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
         JButton addButton = new JButton("Add vehicle");
-        startButton = new JButton("Start");
+        JButton startButton = new JButton("Start");
         JButton addRandomButton = new JButton("Add Random vehicle");
         
         addButton.setFocusable(false);
@@ -88,9 +82,11 @@ public class MenuFrame extends JFrame{
         });
 
         add(vehiclesScrollPane);
-        add(addButton);
-        add(addRandomButton);
-        add(startButton);
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 5));
+        buttonsPanel.add(addButton);
+        buttonsPanel.add(addRandomButton);
+        buttonsPanel.add(startButton);
+        add(buttonsPanel, BorderLayout.PAGE_END);
         setVisible(true);
 
         behaviors = new String[Vehicle.Behavior.values().length];
@@ -106,21 +102,21 @@ public class MenuFrame extends JFrame{
             pathModes[i] = Vehicle.PathMode.values()[i].toString();
         }
 
-        //Update the vehiclesContainer when the frame is resized
+        // Update the vehiclesContainer when the frame is resized
         addComponentListener(new ComponentAdapter(){
             @Override
             public void componentResized(ComponentEvent e){
                 UpdateVehiclesContainer();
             }
         });
-        addWindowStateListener(new WindowStateListener(){
-            public void windowStateChanged(WindowEvent e) {
-                UpdateVehiclesContainer();
-            }
-        });
 
         // Add default vehicle
         AddVehicle();
+
+        // Enable the start button after adding the vehicle
+        startButton.setEnabled(true);
+        
+        setVisible(true);
     }
     
     /**Adds a vehicle with random parameters*/ 
@@ -394,18 +390,12 @@ public class MenuFrame extends JFrame{
         vehiclesContainer.add(vPanel);
         //#endregion
         
-        //Arrange the vPanel to fit in the screen next to the other vPanels
-        int vehiclesPerRow = (int)(vehiclesContainer.getWidth()/(VPANEL_WIDTH+VPANEL_MARGIN));
-        ArrangeVPanel(vehiclesCount-1, vehiclesPerRow);
         
         // Change the size of the vehiclesContainer according to the amount of vehicles
-        vehiclesContainer.setPreferredSize(new Dimension(vehiclesContainer.getWidth(), (int)java.lang.Math.ceil((float)vehiclesCount/vehiclesPerRow) * (VPANEL_HEIGHT+VPANEL_MARGIN)));
-        
+        UpdateVehiclesContainer();
+
         // Update the scrollPane view to refresh the scrollbar
         vehiclesScrollPane.getViewport().setView(vehiclesContainer);
-        
-        startButton.setEnabled(true); // enable the start button when adding a new vehicle
-        setVisible(true);
     }
     
     /**
@@ -440,30 +430,14 @@ public class MenuFrame extends JFrame{
         }
     }
 
+    /**
+     * <p> Updates the vehiclesContainer size and layout.
+     *  
+     * <p> This is needed when a new vehicle is added or when the window is resized
+     */
     private void UpdateVehiclesContainer(){
-        setVisible(true);
-        vehiclesScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight() - 90));
-        vehiclesContainer.setSize(getWidth(), vehiclesContainer.getHeight());
-        int vehiclesPerRow = (int)(vehiclesContainer.getWidth()/(VPANEL_WIDTH+VPANEL_MARGIN));
-        vehiclesContainer.setPreferredSize(new Dimension(getWidth(), (int)java.lang.Math.ceil((float)vehiclesCount/vehiclesPerRow) * (VPANEL_HEIGHT+VPANEL_MARGIN)));
-       
-      for (int i=0; i < vehiclesCount; i++){
-            ArrangeVPanel(i, vehiclesPerRow);
-        }
-    } 
-    
-    private void ArrangeVPanel(int index, int vehiclesPerRow){
-        if (index > 0){
-            Component vPanel = vehiclesContainer.getComponent(index);
-            Component last_vPanel = vehiclesContainer.getComponent(index-1);
-            if ( (index) % vehiclesPerRow == 0){
-                vehiclesLayout.putConstraint(SpringLayout.NORTH, vPanel, VPANEL_MARGIN, SpringLayout.SOUTH, last_vPanel);
-                vehiclesLayout.putConstraint(SpringLayout.WEST, vPanel, 0, SpringLayout.WEST, vehiclesContainer);
-                
-            } else {
-                vehiclesLayout.putConstraint(SpringLayout.WEST, vPanel, VPANEL_MARGIN, SpringLayout.EAST, last_vPanel);
-                vehiclesLayout.putConstraint(SpringLayout.NORTH, vPanel, 0, SpringLayout.NORTH, last_vPanel);
-            }
-        }
+        int vehiclesPerRow = (int)(vehiclesScrollPane.getWidth()/(VPANEL_WIDTH+VPANEL_MARGIN));
+        vehiclesContainer.setPreferredSize(new Dimension(vehiclesScrollPane.getWidth(), (int)java.lang.Math.ceil((float)vehiclesCount/vehiclesPerRow) * (VPANEL_HEIGHT+VPANEL_MARGIN)));
+        vehiclesContainer.revalidate();
     }
 }
