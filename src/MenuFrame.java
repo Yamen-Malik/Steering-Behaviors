@@ -36,6 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MenuFrame extends JFrame{
     int vehiclesCount = 0;
+    int deletedVehiclesCount = 0;
     int maxVehicles = 50;
     JScrollPane vehiclesScrollPane;
     JPanel vehiclesContainer;
@@ -77,6 +78,7 @@ public class MenuFrame extends JFrame{
         addButton.addActionListener(e -> AddVehicle());
         addRandomButton.addActionListener(e -> AddRandomVehicle());
         startButton.addActionListener(e -> {
+            if(vehiclesCount <=0) return;
             setVisible(false);
             App.Start(vehicles);
         });
@@ -153,10 +155,9 @@ public class MenuFrame extends JFrame{
         }
         vehiclesCount++;
         vehicles[vehiclesCount -1]  = vehicle;
-        
         JPanel vPanel = new JPanel(new GridBagLayout());
         vPanel.setPreferredSize(new Dimension(VPANEL_WIDTH, VPANEL_HEIGHT));
-        vPanel.setBorder(new TitledBorder(defaultBorder, "Vehicle " + vehiclesCount));
+        vPanel.setBorder(new TitledBorder(defaultBorder, "Vehicle " + (vehiclesCount + deletedVehiclesCount)));
         
         //#region create lables and set their font
         JLabel massLable = new JLabel("Mass:");
@@ -324,7 +325,17 @@ public class MenuFrame extends JFrame{
         //#endregion
 
 
-
+        // Create the delete button
+        JButton deleteButton = new JButton("Delete");
+        deleteButton.addActionListener(e ->{
+            try{
+                DeleteVehicle(vehicle);
+            } catch (Exception exc){
+                System.out.println(exc.toString());
+                System.out.println("vehcile might be already deleted");
+            }
+        });
+        
         //#region Add all the components to the vPanel
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.NONE;
@@ -387,6 +398,12 @@ public class MenuFrame extends JFrame{
         c.gridy = 4;
         vPanel.add(colorField,c);
 
+        // Add the delete button to the bottom of the panel
+        c.gridx = 0;
+        c.gridy = 5;
+        c.gridwidth = 4;
+        vPanel.add(deleteButton,c);
+
         vehiclesContainer.add(vPanel);
         //#endregion
         
@@ -414,6 +431,49 @@ public class MenuFrame extends JFrame{
         }
     }    
     
+    /**
+     * Deletes the given vehicle from:
+     * <ul>
+     * <li> vehicles array </li>
+     * <li> vehicles target Selectors </li>
+     * <li> vehicles Container </li>
+     * </ul>
+     * <p>then updates the vehicles Container</p>
+     * @param v : instance of Vehicle class
+     */
+    private void DeleteVehicle(Vehicle v) throws Exception{
+        int index = Arrays.asList(vehicles).indexOf(v);
+        if(index == -1){
+            throw new Exception("The given instance of Vehicle doesn't exist in the vehicles list");
+        }
+        for (int i = 0; i < vehiclesCount; i++){
+            if (i == index){
+                continue;
+            }
+            if (targetSelectorsList[i].getItemCount() > 1){
+                // The item index in the combo box list (Add 1 to account for the "None" item)
+                int j = index + ((i > index)? 1 : 0);
+                if(targetSelectorsList[i].getSelectedIndex() == j){
+                    targetSelectorsList[i].setSelectedIndex(0);
+                }
+                targetSelectorsList[i].removeItemAt(j);
+            }
+            if (i > index){
+                // If this vehicle comes after the deleted one then shift it back in the list
+                vehicles[i-1] = vehicles[i];
+                vehicles[i] = null;
+                targetSelectorsList[i-1] = targetSelectorsList[i];
+                targetSelectorsList[i] = null;
+            }
+        }
+        vehiclesCount--;
+        deletedVehiclesCount++;
+        vehiclesContainer.remove(index);
+        UpdateVehiclesContainer();
+        vehiclesContainer.repaint();
+
+    }
+
     /**
      * Enables and Disables the edge mode selector object based on the selected
      * behavior (e.g Flee, Evade = disabled)
