@@ -443,7 +443,8 @@ public class MenuFrame extends JFrame{
         }
         for (int i = 0; i < vehiclesCount; i++){
             if (i == index){
-                continue;
+                vehicles[i] = null;
+                continue; 
             }
             if (targetSelectors[i].getItemCount() > 1){
                 // The item index in the combo box list (Add 1 to account for the "None" item)
