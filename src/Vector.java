@@ -48,7 +48,6 @@ public class Vector{
         setAngleInRadians(Math.toRadians(angle));
     }
     public void setAngleInRadians(double angle){
-        // angle -= (int)(angle % 2*Math.PI) * 2*Math.PI;
         this.angle = angle;
         double[] arr = CalculateXYMag(mag, angle);
         xMag = arr[0];
@@ -164,11 +163,6 @@ public class Vector{
      * @return new Vector, equal to (v1 + v2)
      */
     public static Vector Add(Vector v1, Vector v2){
-        // double newXMag = v1.xMag + v2.xMag;
-        // double newYMag = v1.yMag + v2.yMag;
-        // double newMag = CalculateMag(newXMag, newYMag);
-        // double newAngle = Math.toDegrees(CalculateAgnle(newXMag, newYMag));
-        // return new Vector(newMag, newAngle);
         return new Vector(v1).add(v2);
     }
     /**
@@ -178,8 +172,6 @@ public class Vector{
      * @return new Vector, equal to (v1 - v2)
      */
     public static Vector Subtract(Vector v1, Vector v2){
-        //? which one should I use??
-        // return new Vector(v2).multiply(-1).add(v1);
         return new Vector(v1).subtract(v2);
     }
     public static double DotProduct(Vector v1, Vector v2){
