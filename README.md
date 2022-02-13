@@ -12,10 +12,10 @@ This code uses:
 
 About The App
 --------------
-Start the app by running app.java, the app will open the menu frame first to, then you can start the simulation by clickig the Start button.
+Start the app by running app.java, the app will open the menu frame first, then you can start the simulation by clickig the Start button.
 
-### Menu Frame
-In the menu frame you can add and edit the following vehicles properties:
+## Menu Frame
+In the menu frame you can edit the following vehicles properties:
 * Mass
 * Maximum Velocity
 * Maximum Force
@@ -30,9 +30,15 @@ In the menu frame you can add and edit the following vehicles properties:
 
 ![Menu Preview](https://user-images.githubusercontent.com/60931606/153755395-38f2f5d5-bf15-440a-9414-4027de8ea6d5.png)
 
-### Simulation Frame
+## Simulation Frame
 In this frame you should see the vehicles moving around.
-#### Exampels: (Github reduces the frame rate of the gif)
+
+### Exampels: (Github reduces the frame rate)
+
+#### <pre><center> Behavior: Wander<br> Edge Modes:    Blue: Wrap, Green: Bounce</pre>
 ![Wander](https://user-images.githubusercontent.com/60931606/153756323-ed5a3294-54bb-4ab7-b643-d5d544d12b44.gif)
+
+#### <pre><center> Behavior:    Green: Pursue, White: Wander</pre>
+
 ![Pursue   Wander](https://user-images.githubusercontent.com/60931606/153756421-682e0058-9bc3-4272-8c59-4882589a5747.gif)
 
