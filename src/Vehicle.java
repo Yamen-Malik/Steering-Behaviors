@@ -138,7 +138,7 @@ public class Vehicle {
     }
     public void Edges(int x1,int x2,int y1,int y2){
         switch(edgeMode){
-            case Flip:
+            case Wrap:
                 if(x <= x1){
                     x=x2;
                 }
@@ -229,6 +229,6 @@ public class Vehicle {
     }
 
     enum Behavior{Wander, Seek, Flee, Pursue, Evade}
-    enum EdgeMode {Bounce, Flip}
+    enum EdgeMode {Bounce, Wrap}
     enum PathMode {Dotted, Line}
 }
