@@ -32,7 +32,7 @@ In the menu frame you can add and edit the following vehicles properties:
 
 ### Simulation Frame
 In this frame you should see the vehicles moving around.
-#### Exampels:
-![Wander](https://user-images.githubusercontent.com/60931606/153756086-df564a37-4c74-421b-97d0-668ea1b147e3.gif)
-![Pursue   Wander](https://user-images.githubusercontent.com/60931606/153756070-76faa7d6-58ba-4f6c-90a6-4c1975bb733e.gif)
+#### Exampels: (Github reduces the frame rate of the gif)
+![Wander](https://user-images.githubusercontent.com/60931606/153756323-ed5a3294-54bb-4ab7-b643-d5d544d12b44.gif)
+![Pursue   Wander](https://user-images.githubusercontent.com/60931606/153756421-682e0058-9bc3-4272-8c59-4882589a5747.gif)
 
