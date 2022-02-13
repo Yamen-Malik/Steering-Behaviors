@@ -24,11 +24,15 @@ In the menu frame you can add and edit the following vehicles properties:
 * Target     (the target that the vehicle will Seek/Flee/Pursue/Evade)
 * Edge Mode  (how the vehicle will react when it reaches the edge of the screen)
 * Color
+* Path length (the length of the line that will represent the path)
+* Path Mode (how the path will be drawn on the screen)
 
-![Menu Preview](https://user-images.githubusercontent.com/60931606/153732979-828d430c-111d-46c9-ae95-f69a09ba639e.png)
+
+![Menu Preview](https://user-images.githubusercontent.com/60931606/153755395-38f2f5d5-bf15-440a-9414-4027de8ea6d5.png)
 
 ### Simulation Frame
 In this frame you should see the vehicles moving around.
 #### Exampels:
-![Pursue   Evade](https://user-images.githubusercontent.com/60931606/132954286-c58b26df-a5bb-404d-b202-47cbbc0b6f40.gif)
-![Pursue   Wander](https://user-images.githubusercontent.com/60931606/132954287-9cda9ae4-e9ff-4e87-9c39-450322435ac8.gif)
+![Wander](https://user-images.githubusercontent.com/60931606/153756086-df564a37-4c74-421b-97d0-668ea1b147e3.gif)
+![Pursue   Wander](https://user-images.githubusercontent.com/60931606/153756070-76faa7d6-58ba-4f6c-90a6-4c1975bb733e.gif)
+
