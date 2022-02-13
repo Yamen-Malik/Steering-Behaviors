@@ -1,4 +1,3 @@
-import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -6,10 +5,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
@@ -17,7 +14,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JOptionPane;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,44 +33,46 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MenuFrame extends JFrame{
     int vehiclesCount = 0;
     int deletedVehiclesCount = 0;
-    int maxVehicles = 50;
-    JScrollPane vehiclesScrollPane;
-    JPanel vehiclesContainer;
-    Border defaultBorder;
-    Vehicle[] vehicles = new Vehicle[maxVehicles];
-    String[] behaviors; 
-    String[] edgeModes; 
-    String[] pathModes; 
-    JComboBox<String>[] targetSelectorsList = new JComboBox[maxVehicles];
-    String defaultTargetListText = "None";  // or "Select target"
+    final int MAX_VEHICLES = 50;
+    final JScrollPane vehiclesScrollPane;
+    final JPanel vehiclesContainer;
+    final Border DEFAULT_BORDER;
+    Vehicle[] vehicles = new Vehicle[MAX_VEHICLES];
+    String[] behaviors = new String[Vehicle.Behavior.values().length]; 
+    String[] edgeModes = new String[Vehicle.EdgeMode.values().length]; 
+    String[] pathModes = new String[Vehicle.PathMode.values().length];
+    String[] targets = new String[MAX_VEHICLES+1];
+    JComboBox<String>[] targetSelectors = new JComboBox[MAX_VEHICLES];
+    final String DEFAULT_TARGET = "None";
     final int VPANEL_WIDTH = 400;
     final int VPANEL_HEIGHT = 200;
     final int VPANEL_MARGIN = 5;
-    int initialWidth = 900;
-    int initialHeight = 700;
+    final int INITIAL_WIDTH = 900;
+    final int INITIAL_HEIGHT = 700;
     
     public MenuFrame(){
-        setSize(initialWidth, initialHeight);
+        setSize(INITIAL_WIDTH, INITIAL_HEIGHT);
         setMinimumSize(new Dimension(VPANEL_WIDTH + 80, VPANEL_HEIGHT + 130));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Steering Behaviors Menu");
         
-        defaultBorder = BorderFactory.createLineBorder(Color.lightGray, 3, true);
+        DEFAULT_BORDER = BorderFactory.createLineBorder(Color.lightGray, 3, true);
+        targets[0] = DEFAULT_TARGET;
        
         vehiclesContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, VPANEL_MARGIN, VPANEL_MARGIN));
-        vehiclesScrollPane = new JScrollPane(vehiclesContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        vehiclesScrollPane.setBorder(new TitledBorder(defaultBorder, "Vehicles"));
+        vehiclesScrollPane = new JScrollPane(vehiclesContainer, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        vehiclesScrollPane.setBorder(new TitledBorder(DEFAULT_BORDER, "Vehicles"));
         vehiclesScrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
-        JButton addButton = new JButton("Add vehicle");
+        JButton addButton = new JButton("Add Vehicle");
         JButton startButton = new JButton("Start");
-        JButton addRandomButton = new JButton("Add Random vehicle");
+        JButton addRandomButton = new JButton("Add Random Vehicle");
         
         addButton.setFocusable(false);
         addRandomButton.setFocusable(false);
         startButton.setFocusable(false);
-        startButton.setEnabled(false); // diable the start button until we add vehicles
         addButton.addActionListener(e -> AddVehicle());
         addRandomButton.addActionListener(e -> AddRandomVehicle());
         startButton.addActionListener(e -> {
@@ -89,17 +87,14 @@ public class MenuFrame extends JFrame{
         buttonsPanel.add(addRandomButton);
         buttonsPanel.add(startButton);
         add(buttonsPanel, BorderLayout.PAGE_END);
-        setVisible(true);
-
-        behaviors = new String[Vehicle.Behavior.values().length];
+        
+        // Setup constant arrays for the combo boxes 
         for(int i = 0; i < behaviors.length; i++){
             behaviors[i] = Vehicle.Behavior.values()[i].toString();
         }
-        edgeModes = new String[Vehicle.EdgeMode.values().length];
         for(int i = 0; i < edgeModes.length; i++){
             edgeModes[i] = Vehicle.EdgeMode.values()[i].toString();
         }
-        pathModes = new String[Vehicle.PathMode.values().length];
         for(int i = 0; i < pathModes.length; i++){
             pathModes[i] = Vehicle.PathMode.values()[i].toString();
         }
@@ -115,9 +110,6 @@ public class MenuFrame extends JFrame{
         // Add default vehicle
         AddVehicle();
 
-        // Enable the start button after adding the vehicle
-        startButton.setEnabled(true);
-        
         setVisible(true);
     }
     
@@ -133,7 +125,7 @@ public class MenuFrame extends JFrame{
         vehicle.behavior = Vehicle.Behavior.values()[r.nextInt(Vehicle.Behavior.values().length)];
         vehicle.pathMode = Vehicle.PathMode.values()[r.nextInt(Vehicle.PathMode.values().length)];
         vehicle.color = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
-        if(vehicle.behavior != Vehicle.Behavior.Wander){
+        if(vehicle.behavior != Vehicle.Behavior.Wander && vehiclesCount > 0){
             vehicle.target = vehicles[r.nextInt(vehiclesCount)];
         }
         if(vehicle.behavior != Vehicle.Behavior.Flee && vehicle.behavior != Vehicle.Behavior.Evade){
@@ -144,12 +136,13 @@ public class MenuFrame extends JFrame{
     }
     
     // The tow ways of calling AddVehicle gives me the flexibility to add vehicle presets
+    
     private void AddVehicle() {
         AddVehicle(new Vehicle(0, 0));
     }
     
     private void AddVehicle(Vehicle vehicle){
-        if(vehiclesCount == maxVehicles){
+        if(vehiclesCount == MAX_VEHICLES){
             JOptionPane.showMessageDialog(null, "You reached the maximum number of vehicles");
             return;
         }
@@ -157,7 +150,7 @@ public class MenuFrame extends JFrame{
         vehicles[vehiclesCount -1]  = vehicle;
         JPanel vPanel = new JPanel(new GridBagLayout());
         vPanel.setPreferredSize(new Dimension(VPANEL_WIDTH, VPANEL_HEIGHT));
-        vPanel.setBorder(new TitledBorder(defaultBorder, "Vehicle " + (vehiclesCount + deletedVehiclesCount)));
+        vPanel.setBorder(new TitledBorder(DEFAULT_BORDER, "Vehicle " + (vehiclesCount + deletedVehiclesCount)));
         
         //#region create lables and set their font
         JLabel massLable = new JLabel("Mass:");
@@ -169,8 +162,8 @@ public class MenuFrame extends JFrame{
         JLabel targetLable = new JLabel("Target:");
         JLabel edgeModeLable = new JLabel("Edge Mode:");
         JLabel pathModeLable = new JLabel("Path Mode:");
-        JLabel pathLengthLable = new JLabel("Path Length:");
-        
+        JLabel pathLengthLable = new JLabel("Path Length:");    
+    
         Font font = new Font("Dialog", Font.PLAIN, 12);
         massLable.setFont(font);
         maxVelLable.setFont(font);
@@ -192,7 +185,8 @@ public class MenuFrame extends JFrame{
         JSpinner sizeSpinner = new JSpinner();
         JSpinner pathLengthSpinner = new JSpinner();
         
-        //setting the model of the spinners to set their starting,min and max value and step length (for the spinner buttons)
+        // setting the model of the spinners to set their starting, min, max and
+        // step length (for the spinner buttons)
         massSpinner.setModel(new SpinnerNumberModel(vehicle.mass, 0.5, 100, 0.2));
         maxVelSpinner.setModel(new SpinnerNumberModel(vehicle.maxVel, 0, 100, 1));
         maxForceSpinner.setModel(new SpinnerNumberModel(vehicle.maxForce, 0, 100, 0.1));
@@ -240,31 +234,30 @@ public class MenuFrame extends JFrame{
         behaviorSelector.setSelectedItem(vehicle.behavior.toString());
         edgeModeSelector.setSelectedItem(vehicle.edgeMode.toString());
         pathModeSelector.setSelectedItem(vehicle.pathMode.toString());
-        targetSelectorsList[vehiclesCount -1] = targetSelector;
+        targetSelectors[vehiclesCount -1] = targetSelector;
         targetSelector.setPreferredSize(new Dimension(99, 24));
-        
-        // Update the combobox models for all target selectors  (every time a new vehicle in added)
-        for (int i = 0; i < vehiclesCount; i++){
-            String[] targetsArray = new String[vehiclesCount];
-            targetsArray[0] = defaultTargetListText;
-            boolean shiftIndex = false;
-            for(int j = 1; j < vehiclesCount + 1; j++){  // skip adding the name of the current vehicle
-                if (j == i+1){
-                    shiftIndex = true;          // shift all next elements in the array by -1 (because this code skips 1 index in the array)
-                    continue;
-                }
-                targetsArray[(shiftIndex)? j-1 : j] = "Vehicle " + j;
-            }
-            int selectedItemIndex = targetSelectorsList[i].getSelectedIndex(); // keep a backup of the curren selected item (setting an new model will reset the slected item)
-            targetSelectorsList[i].setModel(new DefaultComboBoxModel<String>(targetsArray)); // Apply the updated targets list tom the combo box
-            targetSelectorsList[i].setSelectedIndex(selectedItemIndex);
+
+        // region Update the combobox models for all target selectors
+
+        // Add the targets of this vehicle to its combo box
+        for(int i = 0; i < vehiclesCount; i++){
+            if(targets[i] == "") break;
+
+            targetSelector.addItem(targets[i]);
         }
-        if (vehicle.target != null) { // if the vehicle object has a target set the combo box to that target
-            targetSelector.setSelectedItem("Vehicle " + (Arrays.asList(vehicles).indexOf(vehicle.target) + 1));
-        }else{
-            targetSelector.setSelectedIndex(0);
+        targets[vehiclesCount] = "Vehicle " + (vehiclesCount + deletedVehiclesCount);
+        
+        // Add the new vehicle to the other combo boxes
+        for (int i = 0; i < vehiclesCount-1; i++){
+            targetSelectors[i].addItem(targets[vehiclesCount]); 
         }
 
+        // Set the combo box to the target of the vehicle
+        if (vehicle.target != null) {
+            targetSelector.setSelectedIndex(Arrays.asList(vehicles).indexOf(vehicle.target)+1);
+        }
+        // endregion
+       
         UpdateTargetSelector(targetSelector, String.valueOf(behaviorSelector.getSelectedItem()));
 
         behaviorSelector.setFocusable(false);
@@ -282,7 +275,7 @@ public class MenuFrame extends JFrame{
             if(targetIndex <= -1){
                 vehicle.target = null;
             } else{
-                // increade the target index from the combo box by one if the vehicle index in
+                // increase the target index from the combo box by one if the vehicle index in
                 // the vehicles array is less or equal to it, because the combo box for targets
                 // doesn't include the vehicle that we are choosing a target for
                 if(Arrays.asList(vehicles).indexOf(vehicle) <= targetIndex) {targetIndex++;}
@@ -298,7 +291,8 @@ public class MenuFrame extends JFrame{
         //#endregion
         
         //#region Create Text fields
-        JTextField colorField = new JTextField(String.format("#%02X%02X%02X",vehicle.color.getRed(), vehicle.color.getGreen(), vehicle.color.getBlue()));
+        JTextField colorField = new JTextField(String.format("#%02X%02X%02X", vehicle.color.getRed(),
+                vehicle.color.getGreen(), vehicle.color.getBlue()));
         colorField.setPreferredSize(new Dimension(75, 20));
         colorField.addKeyListener(new KeyAdapter(){
             @Override
@@ -307,19 +301,23 @@ public class MenuFrame extends JFrame{
                 //Don't add the new character if the amount of characters >= 7 (max for hex, including the "#")
                 if(fieldText.length() >= 7){
                     e.consume();
-                }else{ // if it can add typed character add it to the locl variable (fieldText) to test the format 
+                } else{
+                    // Add the character to the locl variable (fieldText) to test the format 
                     fieldText += e.getKeyChar();
                 }
                 if(fieldText.length() == 7 && fieldText.substring(0, 1).equals("#")){
-                    try {  // try to decode the hex format
+                    // try to decode the hex format 
+                    // and if the hex format is invalid keep the old color
+                    try {
                         vehicle.color = Color.decode(fieldText);
                         colorField.setBorder(BorderFactory.createLineBorder(Color.gray));
                         return;
-                    } catch (Exception exception) { // if the hex format is invalid keep the old color
+                    } catch (Exception exception) {
                         // do nothing
                     }
                 }
-                colorField.setBorder(BorderFactory.createLineBorder(Color.RED));    // this indicates to the use that the given format is invalid
+                // this indicates to the user that the given format is invalid
+                colorField.setBorder(BorderFactory.createLineBorder(Color.RED));
             }
         });
         //#endregion
@@ -332,7 +330,7 @@ public class MenuFrame extends JFrame{
                 DeleteVehicle(vehicle);
             } catch (Exception exc){
                 System.out.println(exc.toString());
-                System.out.println("vehcile might be already deleted");
+                System.out.println("Vehcile might be already deleted");
             }
         });
         
@@ -410,9 +408,6 @@ public class MenuFrame extends JFrame{
         
         // Change the size of the vehiclesContainer according to the amount of vehicles
         UpdateVehiclesContainer();
-
-        // Update the scrollPane view to refresh the scrollbar
-        vehiclesScrollPane.getViewport().setView(vehiclesContainer);
     }
     
     /**
@@ -450,20 +445,26 @@ public class MenuFrame extends JFrame{
             if (i == index){
                 continue;
             }
-            if (targetSelectorsList[i].getItemCount() > 1){
+            if (targetSelectors[i].getItemCount() > 1){
                 // The item index in the combo box list (Add 1 to account for the "None" item)
                 int j = index + ((i > index)? 1 : 0);
-                if(targetSelectorsList[i].getSelectedIndex() == j){
-                    targetSelectorsList[i].setSelectedIndex(0);
+                if(targetSelectors[i].getSelectedIndex() == j){
+                    targetSelectors[i].setSelectedIndex(0);
                 }
-                targetSelectorsList[i].removeItemAt(j);
+                targetSelectors[i].removeItemAt(j);
             }
             if (i > index){
                 // If this vehicle comes after the deleted one then shift it back in the list
                 vehicles[i-1] = vehicles[i];
                 vehicles[i] = null;
-                targetSelectorsList[i-1] = targetSelectorsList[i];
-                targetSelectorsList[i] = null;
+                
+                targetSelectors[i-1] = targetSelectors[i];
+                targetSelectors[i] = null;
+                
+                // i doesn't include the first item in targets -> "None"
+                // therefore this vehicle index in the targets array is i+1
+                targets[i] = targets[i+1];
+                targets[i+1] = "";
             }
         }
         vehiclesCount--;
@@ -497,7 +498,8 @@ public class MenuFrame extends JFrame{
      */
     private void UpdateVehiclesContainer(){
         int vehiclesPerRow = (int)(vehiclesScrollPane.getWidth()/(VPANEL_WIDTH+VPANEL_MARGIN));
-        vehiclesContainer.setPreferredSize(new Dimension(vehiclesScrollPane.getWidth(), (int)java.lang.Math.ceil((float)vehiclesCount/vehiclesPerRow) * (VPANEL_HEIGHT+VPANEL_MARGIN)));
+        vehiclesContainer.setPreferredSize(new Dimension(vehiclesScrollPane.getWidth(),
+                (int) java.lang.Math.ceil((float) vehiclesCount / vehiclesPerRow) * (VPANEL_HEIGHT + VPANEL_MARGIN)));
         vehiclesContainer.revalidate();
     }
 }
