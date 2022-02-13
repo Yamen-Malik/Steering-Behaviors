@@ -25,7 +25,7 @@ In the menu frame you can add and edit the following vehicles properties:
 * Edge Mode  (how the vehicle will react when it reaches the edge of the screen)
 * Color
 
-![Menu Preview](https://user-images.githubusercontent.com/60931606/132954498-4262a4a3-104c-48a5-9728-ba2e722d863f.png)
+![Menu Preview](https://user-images.githubusercontent.com/60931606/153732979-828d430c-111d-46c9-ae95-f69a09ba639e.png)
 
 ### Simulation Frame
 In this frame you should see the vehicles moving around.
