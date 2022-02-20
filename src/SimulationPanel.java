@@ -18,7 +18,7 @@ public class SimulationPanel extends JPanel {
             return;
         }
         if (image == null)
-            SetupImage();
+            ResetImage();
 
         // Draw predicted position after 5 frames
         g2d.setColor(Color.YELLOW);
@@ -66,13 +66,9 @@ public class SimulationPanel extends JPanel {
         ResetImage();
     }
 
-    void SetupImage() {
+    void ResetImage() {
         image = createImage(getWidth(), getHeight());
         g2d = (Graphics2D) image.getGraphics();
-        ResetImage();
-    }
-
-    void ResetImage() {
         g2d.setBackground(getBackground());
         g2d.clearRect(0, 0, getWidth(), getHeight());
     }
